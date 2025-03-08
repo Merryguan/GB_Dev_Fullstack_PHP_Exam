@@ -1,0 +1,15 @@
+# Ignore Comsoser's files
+/Exam/code/vendor/
+/Exam/code/composer.lock
+
+# Ignore cache files
+/Exam/code/cache
+
+# Ignore .env
+/Exam/.env
+
+# Ignore config files
+/Exam/code/src/config
+
+# ignore db files
+/Exam/db
