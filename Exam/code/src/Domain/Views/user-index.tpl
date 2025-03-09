@@ -8,11 +8,15 @@
               <th scope="col">Имя</th>
               <th scope="col">Фамилия</th>
               <th scope="col">День рождения</th>
+              {% if isAdmin %}
+              <th scope="col">Редактирование</th>
+              <th scope="col">Удаление</th>
+              {% endif %}
             </tr>
           </thead>
           <tbody>
             {% for user in users %}
-            <tr>       
+            <tr class="{{ user.getUserId() }}">       
               <td>{{ user.getUserId() }}</td>   
               <td>{{ user.getUserName() }}</td>
               <td>{{ user.getUserLastName() }}</td>
@@ -22,6 +26,20 @@
                     <b>Не задан</b>
                   {% endif %}
               </td>
+              {% if isAdmin %}
+                <td scope="col"><a href="/user/edit/?id_user={{ user.getUserId() }}">Редактирование</a></td>
+                <td scope="col"><button type="button" onclick="delete_user()">Удаление</button></td>
+                <script>
+                  function delete_user() {
+                    $.ajax({
+                      method: 'POST',
+                      url: "/user/delete/?user_id={{ user.getUserId() }}"
+                    }).done(function (response) {
+                      $('.{{ user.getUserId() }}').remove();
+                    });
+                  }
+                </script>
+              {% endif %}
             </tr>
             {% endfor %}
           </tbody>

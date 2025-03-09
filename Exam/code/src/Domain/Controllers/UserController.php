@@ -26,13 +26,13 @@ class UserController extends AbstractController {
                     'title' => 'Список пользователей в хранилище',
                     'message' => "Список пуст или не найден"
                 ]);
-        }
-        else{
+        } else {
             return $render->renderPage(
                 'user-index.tpl', 
                 [
                     'title' => 'Список пользователей в хранилище',
-                    'users' => $users
+                    'users' => $users,
+                    'isAdmin' => User::isAdmin($_SESSION['id_user'] ?? null)
                 ]);
         }
     }
@@ -98,13 +98,61 @@ class UserController extends AbstractController {
     }
 
     public function actionEdit(): string {
+
+        $result = User::getUserFromStorageById($_GET['id_user']);
+
         $render = new Render();
         
         return $render->renderPageWithForm(
                 'user-form.tpl', 
                 [
-                    'title' => 'Форма создания пользователя'
+                    'title' => 'Форма создания пользователя',
+                    'method' => 'update',
+                    'id' => $result->getUserId(),
+                    'user_name' => $result->getUserName(),
+                    'user_lastname' => $result->getUserLastname(),
+                    'user_birthday' => date("d-m-Y", $result->getUserBirthday()),
+                    'user_login' => $result->getUserLogin()
                 ]);
+
+    }
+
+    public function actionUpdate(): string {
+        
+        if(User::validateRequestData()) {
+            $user = new User();
+            $user->setParamsFromRequestData();
+            $user->updateToStorage();
+
+            $render = new Render();
+
+            return $render->renderPage(
+                'user-created.tpl', 
+                [
+                    'title' => 'Пользователь обновлен',
+                    'message' => "Обновлен пользователь " . $user->getUserName() . " " . $user->getUserLastName()
+                ]);
+        }
+        else {
+            throw new \Exception("Переданные данные некорректны");
+        }
+    }
+
+    public function actionDelete() {
+      
+        $user = new User();
+        $user->setUserId($_GET['user_id']);
+        $user->DeleteFromStorage();
+/*
+        $render = new Render();
+
+        return $render->renderPage(
+            'user-created.tpl', 
+            [
+                'title' => 'Пользователь удален',
+                'message' => "Удален пользователь "
+            ]);
+*/        
     }
 
     public function actionAuth(): string {
